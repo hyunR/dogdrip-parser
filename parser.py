@@ -1,7 +1,10 @@
-import os, io, re
-import requests, json 
-import datetime
+import os
+import re
+import io
+import json
 import argparse 
+import datetime
+import requests 
 
 from PIL import Image
 from tqdm import tqdm
@@ -10,12 +13,20 @@ from bs4 import BeautifulSoup
 
 BASE_URL = "https://www.dogdrip.net"
 
-def parser_page(url: str, num_announce: int = None, download_path: str = "./downloads"):
+def parse(url: str, start_index: int, end_index: int, download_path: str = "./downloads"):
+    create_dir_if_not(download_path)
+    mid_form_url = convert_url_into_mid_format(url)
+    num_of_announcement = get_number_of_announcement(mid_form_url)
+    index_lst = range(start_index, end_index + 1)
+
+    for i in tqdm(index_lst):
+        parser_page(mid_form_url + str(i), download_path, num_of_announcement)
+
+def parser_page(url: str, download_path: str, num_announce: int = None):
     """ takes in url as parameter
     url should contain list of posts like following 
     https://www.dogdrip.net/index.php?mid=duck&page=1 
     """
-    
     if num_announce is None:
         num_announce = get_number_of_announcement(url)
 
@@ -195,6 +206,7 @@ def get_document_srl(url: str) -> str:
 
 #  Helper functions
 def convert_url_into_mid_format(url: str) -> str:
+    print(url)
     board_name = re.search("net\/(\w*)", url).group(1)
     return f"https://www.dogdrip.net/index.php?mid={board_name}&page="  
 
@@ -235,14 +247,13 @@ def get_next_avaliable_dir_path(dir_path: str) -> str:
 def sanitize_path(path):
     return re.sub(r'\\|\:|\?|\*|\"|\<|\>|\||\/|\.',"" , path)
 
-if __name__ == "__main__":
-    # parser = argparse.ArgumentParser(description="개드립 parser")
-    # parser.add_argument("--download_path", metavar='d', default="./downloads", type=str, help="파일이 다운될 주소입니다.")
-    # parser.add_argument("--url", metavar='u', type=str, help="파싱할 게시판 주소입니다.")
-    # parser.add_argument("--start_index", metavar='s', default=1, type=int, help="파싱할 게시판의 시작 페이지 번호입니다.")
-    # parser.add_argument("--end_index", metavar='e', default=50, type=int, help="파싱할 게시판의 마지막 페이지 번호입니다.")
-    
-    # args = parser.parse_args()
 
-    parser_page("https://www.dogdrip.net/index.php?mid=duck&page=3")
-    # download_imgs_from_url("https://www.dogdrip.net/235411761")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="개드립 parser")
+    parser.add_argument("--download_path", metavar='d', default="./downloads", type=str, help="파일이 다운될 주소입니다.")
+    parser.add_argument("--url", metavar='u', type=str, help="파싱할 게시판 주소입니다.")
+    parser.add_argument("--start_index", metavar='s', default=1, type=int, help="파싱할 게시판의 시작 페이지 번호입니다.")
+    parser.add_argument("--end_index", metavar='e', default=50, type=int, help="파싱할 게시판의 마지막 페이지 번호입니다.")
+    
+    args = parser.parse_args()
+    parse(args.url, args.start_index, args.end_index, args.download_path)
