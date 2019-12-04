@@ -29,7 +29,7 @@ def parser_page(url: str, download_path: str, num_announce: int = None):
     """
     if num_announce is None:
         num_announce = get_number_of_announcement(url)
-
+    
     bsobj = get_soup_from_url(url)
     lst_tr = find_tr(bsobj)
 
@@ -41,7 +41,6 @@ def parser_page(url: str, download_path: str, num_announce: int = None):
         dir_path = get_next_avaliable_dir_path(maybe_dir_path)
         create_dir_if_not(dir_path)
         tr_url = tr_dict["url"]
-
         download_imgs_from_url(tr_url, dir_path)
 
         try:
@@ -78,16 +77,15 @@ def download_img(img_url, path, img_count):
         except:
             error_message = f"[GET ERROR] fail to get {img_url}"
             write_to_log(error_message)
-
-    if r.status_code == 200:
-        try:
-            img = Image.open(io.BytesIO(r.content)).convert("RGB")
-            img_format = img.format if img.format is not None else "jpeg"
-            img_path = os.path.join(path, f"{img_name}.{img_format}")
-            img.save(img_path)
-        except Exception as e:
-            error_message = f"[Write ERROR] fail to write {img_url}"
-            write_to_log(error_message)
+    try:
+        if r.status_code == 200:
+                img = Image.open(io.BytesIO(r.content)).convert("RGB")
+                img_format = img.format if img.format is not None else "jpeg"
+                img_path = os.path.join(path, f"{img_name}.{img_format}")
+                img.save(img_path)
+    except Exception as e:
+        error_message = f"[Write ERROR] fail to write {img_url}"
+        write_to_log(error_message)
 
 # Functions for convert tr_obj -> dict 
 
@@ -144,8 +142,13 @@ def get_poster(tr_obj) -> str:
     return tr_obj.select('.author')[0].text.strip()
 
 def get_url(tr_obj) -> str:
-    return tr_obj.select("a")[0]["href"]
-
+    href = tr_obj.select("a")[0]["href"]
+    srl = re.match(".*document_srl=(\d+)", href)
+    if srl is not None:
+        return f"{BASE_URL}/{srl.group(1)}"
+    else:
+        return href 
+"/index.php?mid=duck&sort_index=popular&page=1&document_srl=236491770"
 def get_num_of_thumup(tr_obj) -> str:
     try:
         return tr_obj.select('.ed.voteNum.text-primary')[0].text.strip()
@@ -218,9 +221,15 @@ def get_document_srl(url: str) -> str:
 
 #  Helper functions
 def convert_url_into_mid_format(url: str) -> str:
-    print(url)
-    board_name = re.search("net\/(\w*)", url).group(1)
-    return f"https://www.dogdrip.net/index.php?mid={board_name}&page="  
+    regular_board_name = re.search("net\/(\w*)$", url)
+    if regular_board_name is not None:
+        return f"https://www.dogdrip.net/index.php?mid={regular_board_name.group(1)}&page="  
+    else :
+        popular_board_name = re.match(".*mid=\w+\&sort_index=popular", "https://www.dogdrip.net/index.php?mid=duck&sort_index=popular")
+        if popular_board_name is not None:
+            return url + "&page="
+        else :
+            raise ValueError("Given url cannot be parsed")
 
 def get_soup_from_url(url: str) -> str:
     r = requests.get(url)

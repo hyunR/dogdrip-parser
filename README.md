@@ -46,9 +46,9 @@ python parser for dogdrip.net
 
 ## 예시
 
-`python3 parser.py --download_path ./downloads --url https://www.dogdrip.net/duck --start_index 1 --end_index 50`
+`python3 parser.py --download_path ./downloads --url "https://www.dogdrip.net/duck" --start_index 1 --end_index 50`
 
-`--url https://www.dogdrip.net/duck` : https://www.dogdrip.net/duck 에 있는 글들을 
+`--url "https://www.dogdrip.net/duck"` : https://www.dogdrip.net/duck 에 있는 글들을 
 
 `--start_index 1` : 1 페이지 부터 
 
