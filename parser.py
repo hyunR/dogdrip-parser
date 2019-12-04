@@ -97,14 +97,26 @@ def convert_tr_to_dict(tr_obj):
     Example :
       result_dict = 
         {
-            postnum:123123, 
-            title : "갓경특", 
-            poster: "",
-            num_of_thumup : 2,
-            date : "2019.03.01" 
-            views : 123,
-            num_comments : 5,
-            image : 1
+            "postnum": "해당 글 번호",
+            "url": "해당 글 url",
+            "title": "해당 글 제목",
+            "poster": "글쓴이",
+            "num_of_thumup": "추천 수",
+            "date": "글 작성 시간",
+            "views": "조회수",
+            "num_comments": "댓글 수",
+            "image": 이미지가 존제하면 "1", 없으면 "0",
+            "post_content": [
+                "글 내용"
+            ],
+            "post_comment_lst": [
+                {
+                    "commentor": "댓글 작성자 닉네임",
+                    "date": "댓글 작성 시간",
+                    "comment": "댓글 내용",
+                    "dogdrip_con": "개드립콘 존재시 개드립콘 url"
+                }
+            ]
         }
     """
     result_dict = {}
@@ -156,9 +168,9 @@ def get_num_comments(tr_obj) -> str:
     except:
         return "0"
 
-def get_image_or_not(tr_obj) -> int:
-    # 1 for true, 0 for false
-    return len(tr_obj.select('.ed.print-icon.margin-left-xxsmall'))
+def get_image_or_not(tr_obj) -> str:
+    # "1" for true, "0" for false
+    return str(len(tr_obj.select('.ed.print-icon.margin-left-xxsmall')))
 
 # Helper function for parse content within post
 def get_post_content_and_comments(url):
