@@ -28,7 +28,7 @@ python parser for dogdrip.net
     "date": "글 작성 시간",
     "views": "조회수",
     "num_comments": "댓글 수",
-    "image": 이미지가 존제하면 "1", 없으면 "0",
+    "image": "이미지가 존재하면 1, 없으면 0",
     "post_content": [
         "글 내용"
     ],
