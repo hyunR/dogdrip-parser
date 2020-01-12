@@ -8,7 +8,6 @@ import requests
 
 from PIL import Image
 from tqdm import tqdm
-from time import sleep
 from bs4 import BeautifulSoup
 
 BASE_URL = "https://www.dogdrip.net"
@@ -112,7 +111,8 @@ def convert_tr_to_dict(tr_obj):
                     "commentor": "댓글 작성자 닉네임",
                     "date": "댓글 작성 시간",
                     "comment": "댓글 내용",
-                    "dogdrip_con": "개드립콘 존재시 개드립콘 url"
+                    "dogdrip_con": "개드립콘 존재시 개드립콘 url",
+                    "reply_to": "다른 이에게 다는 답글일시 그 대상의 닉네임을, 아니면 빈 문자열을"
                 }
             ]
         }
@@ -201,9 +201,12 @@ def get_post_comments(soup):
             comment = c.select("div > .xe_content > a")[0].attrs['title']
             dogdrip_con = c.select("div > .xe_content > a")[0].attrs['style']
         
+        reply_to = check_comment_reply(comment) if check_comment_reply(comment) is not None else ""
+
         comment_dict["commentor"] = commentor
         comment_dict["date"] = date
-        comment_dict["comment"] = comment
+        comment_dict["reply_to"] = reply_to.replace("@", "")
+        comment_dict["comment"] = comment if reply_to == "" else comment.replace(reply_to, "")
         comment_dict["dogdrip_con"] = dogdrip_con
 
         comment_lst.append(comment_dict)
@@ -267,6 +270,14 @@ def get_next_avaliable_dir_path(dir_path: str) -> str:
 
 def sanitize_path(path):
     return re.sub(r'\\|\:|\?|\*|\"|\<|\>|\||\/|\.',"" , path)
+
+def check_comment_reply(comment):
+    result = re.search("(\@........)", comment)
+    try:
+        maybe_result = result.group(1)
+    except Exception:
+        maybe_result = None
+    return maybe_result
 
 
 if __name__ == "__main__":

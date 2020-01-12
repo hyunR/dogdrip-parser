@@ -37,7 +37,8 @@ python parser for dogdrip.net
             "commentor": "댓글 작성자 닉네임",
             "date": "댓글 작성 시간",
             "comment": "댓글 내용",
-            "dogdrip_con": "개드립콘 존재시 개드립콘 url"
+            "dogdrip_con": "개드립콘 존재시 개드립콘 url",
+            "reply_to": "다른 이에게 다는 답글일시 그 대상의 닉네임을, 아니면 빈 문자열을"
         }
     ]
 }
